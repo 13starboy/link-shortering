@@ -3,9 +3,16 @@
 
 set -e
 
+echo "========================================"
+echo "URL Shortener Service - Starting on Render"
+echo "========================================"
+echo "PORT: $PORT"
+echo "DATABASE_URL: ${DATABASE_URL//:[^@]*/@***}"  # Скрываем пароль
+echo "========================================"
 
+# Функция ожидания PostgreSQL
 wait_for_postgres() {
-    echo "Waiting for PostgreSQL..."
+    echo "⏳ Waiting for PostgreSQL..."
     local retries=30
     local count=0
     
@@ -18,16 +25,16 @@ import sys
 
 async def check():
     try:
-        conn = await asyncpg.connect(
-            host=os.getenv('DB_HOST', 'postgres'),
-            port=os.getenv('DB_PORT', '5432'),
-            user=os.getenv('DB_USER', 'urlshortener'),
-            password=os.getenv('DB_PASSWORD', 'urlshortener123'),
-            database=os.getenv('DB_NAME', 'urlshortener')
-        )
-        await conn.close()
-        return True
-    except:
+        # Render предоставляет DATABASE_URL
+        db_url = os.getenv('DATABASE_URL')
+        if db_url:
+            # Убираем +asyncpg если есть
+            db_url = db_url.replace('+asyncpg', '')
+            conn = await asyncpg.connect(db_url)
+            await conn.close()
+            return True
+    except Exception as e:
+        print(f'Connection error: {e}', file=sys.stderr)
         return False
 
 if asyncio.run(check()):
@@ -35,67 +42,41 @@ if asyncio.run(check()):
 else:
     sys.exit(1)
 " 2>/dev/null; then
-            echo "PostgreSQL is ready!"
+            echo "✅ PostgreSQL is ready!"
             return 0
         fi
         
-        echo "PostgreSQL not ready yet... ($((count+1))/$retries)"
+        echo "⏳ PostgreSQL not ready yet... ($((count+1))/$retries)"
         sleep 2
         count=$((count + 1))
     done
     
-    echo "PostgreSQL failed to start"
+    echo "❌ PostgreSQL failed to start after $retries attempts"
+    echo "Please check your DATABASE_URL in Render dashboard"
     return 1
 }
 
 
-wait_for_redis() {
-    echo "Waiting for Redis..."
-    local retries=30
-    local count=0
-    
-    while [ $count -lt $retries ]; do
-        if python -c "
-import redis
-import os
-import sys
-
-try:
-    r = redis.from_url(os.getenv('REDIS_URL', 'redis://redis:6379/0'))
-    r.ping()
-    sys.exit(0)
-except:
-    sys.exit(1)
-" 2>/dev/null; then
-            echo "Redis is ready!"
-            return 0
-        fi
-        
-        echo "Redis not ready yet... ($((count+1))/$retries)"
-        sleep 2
-        count=$((count + 1))
-    done
-    
-    echo "Redis failed to start, continuing anyway..."
-    return 0
+wait_for_postgres || {
+    echo "❌ Cannot continue without PostgreSQL"
+    exit 1
 }
 
 
-wait_for_postgres
-wait_for_redis
-
-echo "Running database migrations..."
+echo "🔄 Running database migrations..."
 alembic upgrade head
 
 if [ $? -eq 0 ]; then
-    echo "Migrations completed successfully"
+    echo "✅ Migrations completed successfully"
 else
-    echo "Migrations failed"
+    echo "❌ Migrations failed"
+    echo "Checking migration history..."
+    alembic history
     exit 1
 fi
 
 
 mkdir -p /app/logs
 
-echo "Starting application server..."
+echo "🚀 Starting application server on port $PORT..."
 exec "$@"
