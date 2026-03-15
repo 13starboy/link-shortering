@@ -51,26 +51,27 @@ swagger urls info:
 --
 ## Тестирование
 для запуска тестов
-
+```
 pip install -r requirements.txt
 
 pytest tests -v
-
+```
 
 для получения отчета
-
+```
 coverage run -m pytest tests
-
+```
 для просмотра в консоле:
-
+```
 coverage report
-
+```
 для генерации html отчета
-
+```
 coverage html
-
+```
 --
 ## Результаты
+```
 (venv) PS C:\project\link-shortering> coverage run -m pytest tests
 ================================================= test session starts =================================================
 platform win32 -- Python 3.11.9, pytest-7.4.3, pluggy-1.6.0 -- C:\project\link-shortering\venv\Scripts\python.exe
@@ -200,10 +201,11 @@ tests/test_unit/test_utils.py::TestEmailValidation::test_valid_emails_accepted P
 tests/test_unit/test_utils.py::TestEmailValidation::test_invalid_emails_rejected PASSED                          [ 98%]
 tests/test_unit/test_utils.py::TestPasswordValidation::test_valid_passwords_accepted PASSED                      [ 99%]
 tests/test_unit/test_utils.py::TestPasswordValidation::test_invalid_passwords_rejected PASSED                    [100%]
-
+```
 ================================================= 119 passed in 4.35s =================================================
 
 ### Детальный отчет по модулям:
+
 
 | Модуль | Файл | Покрытие |
 |--------|------|----------|
