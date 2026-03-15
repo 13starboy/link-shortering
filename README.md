@@ -53,13 +53,20 @@ swagger urls info:
 для запуска тестов
 
 pip install -r requirements.txt
+
 pytest tests -v
 
+
 для получения отчета
+
 coverage run -m pytest tests
+
 для просмотра в консоле:
+
 coverage report
+
 для генерации html отчета
+
 coverage html
 
 --
