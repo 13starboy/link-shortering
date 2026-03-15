@@ -1,0 +1,27 @@
+[run]
+source = app
+omit =
+    app/alembic/*
+    app/__init__.py
+    tests/*
+    */test_*
+    */__init__.py
+    */migrations/*
+    */.env
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if __name__ == .__main__.:
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if False:
+    if __debug__:
+    except ImportError:
+    except Exception:
+
+[html]
+directory = coverage_html
+title = URL Shortener Coverage Report
