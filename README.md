@@ -197,3 +197,22 @@ tests/test_unit/test_utils.py::TestPasswordValidation::test_invalid_passwords_re
 ================================================= 119 passed in 4.35s =================================================
 
 Покрытие
+(venv) PS C:\project\link-shortering> coverage report
+Name                            Stmts   Miss  Cover
+---------------------------------------------------
+app\api\dependencies.py            34      1    97%
+app\api\endpoints\auth.py          31      0   100%
+app\api\endpoints\links.py        106      9    92%
+app\api\middleware\auth.py         28      2    93%
+app\core\config.py                 11      0   100%
+app\core\database.py               11      0   100%
+app\core\security.py               24      0   100%
+app\main.py                        23      6    74%
+app\models\models.py               30      0   100%
+app\schemas\schemas.py             51      0   100%
+app\services\cache_service.py      61      4    93%
+---------------------------------------------------
+TOTAL                             410     22    95%
+
+
+
